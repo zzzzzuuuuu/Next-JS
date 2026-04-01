@@ -1,4 +1,3 @@
-import { log } from "console";
 import Image from "next/image";
 
 async function getMovies() {
@@ -25,7 +24,6 @@ async function getMovies() {
 
 export default async function Home() {
   const movies = await getMovies();
-  log(movies);
 
   return (
     <main className="min-h-screen bg-zinc-950 px-6 py-10 text-white">
