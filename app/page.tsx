@@ -26,7 +26,7 @@ export default async function Home() {
   const movies = await getMovies();
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-6 py-10 text-white">
+    <div className="min-h-screen bg-zinc-950 px-6 py-10 text-white">
       <h1 className="mb-8 text-3xl font-bold">🎬 상영 중 영화</h1>
 
       <ul className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
@@ -59,6 +59,6 @@ export default async function Home() {
           </li>
         ))}
       </ul>
-    </main>
+    </div>
   );
 }
