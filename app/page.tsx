@@ -1,12 +1,20 @@
-import Image from "next/image";
+import Image from 'next/image';
+import { redirect } from 'next/navigation';
+import { auth } from '@/auth';
+
+type Movie = {
+  id: number;
+  title: string;
+  poster_path: string | null;
+};
 
 async function getMovies() {
   try {
     const res = await fetch(
-      `https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=1&api_key=${process.env.NEXT_PUBLIC_TMDB_KEY}`,
+      `https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=1&api_key=${process.env.TMDB_KEY}`,
       {
-        next: { revalidate: 60 },
-      },
+        next: { revalidate: 60 }
+      }
     );
 
     if (!res.ok) {
@@ -14,15 +22,21 @@ async function getMovies() {
     }
 
     const data = await res.json();
-    console.log("Movies data:", data.results);
-    return data.results;
+    console.log('Movies data:', data.results);
+    return data.results as Movie[];
   } catch (error) {
-    console.error("Error fetching movies:", error);
+    console.error('Error fetching movies:', error);
     throw error;
   }
 }
 
 export default async function Home() {
+  const session = await auth();
+
+  if (!session?.user) {
+    redirect('/login');
+  }
+
   const movies = await getMovies();
 
   return (
@@ -30,12 +44,12 @@ export default async function Home() {
       <h1 className="mb-8 text-3xl font-bold">🎬 상영 중 영화</h1>
 
       <ul className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {movies.map((movie) => (
+        {movies.map(movie => (
           <li
             key={movie.id}
             className="overflow-hidden rounded-xl bg-zinc-900 shadow-lg transition hover:-translate-y-1 hover:shadow-xl"
           >
-            <div className="aspect-[2/3] w-full bg-zinc-800">
+            <div className="aspect-2/3 w-full bg-zinc-800">
               {movie.poster_path ? (
                 <Image
                   src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -52,9 +66,7 @@ export default async function Home() {
             </div>
 
             <div className="p-3">
-              <p className="line-clamp-2 text-sm font-semibold">
-                {movie.title}
-              </p>
+              <p className="line-clamp-2 text-sm font-semibold">{movie.title}</p>
             </div>
           </li>
         ))}
@@ -62,3 +74,4 @@ export default async function Home() {
     </div>
   );
 }
+
